@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhenoBrasil – Seed Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0d; --bg2: #141414; --gold: #c9a84c; --green: #3a7d44;
+            --white: #f0ede8; --muted: #888; --border: #2a2a2a;
+        }
+        body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--white); }
+        /* Adicione aqui os estilos CSS que definimos anteriormente para o layout do grid e dos modais */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1px; background: var(--border); }
+        .product-card { background: var(--bg); padding: 1rem; }
+        .product-img { width: 100%; height: 200px; object-fit: cover; }
+        .product-name { font-weight: 700; color: var(--white); margin: 0.5rem 0; }
+        .product-price { color: var(--gold); font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">PhenoBrasil</div>
+        <div class="cart-icon" onclick="showToast('🛒 Carrinho aberto!')">
+            🛒 <span id="cart-count">0</span>
+        </div>
+    </nav>
+
+    <div class="main-wrap" id="catalogo">
+        <div class="product-grid" id="products"></div>
+    </div>
+
+    <div id="toast" style="display:none; position:fixed; bottom:20px; right:20px; background:#333; padding:10px;"></div>
+
+    <script>
+        // Simulação dos seus produtos (Substitua pelo conteúdo real do seu products.js)
+        const products = [
+            { name: "Genética A", price: "R$ 150,00", breeder: "rasbreeder", img: "img1.jpg" },
+            { name: "Genética B", price: "R$ 180,00", breeder: "basinaldo", img: "img2.jpg" }
+        ];
+
+        const grid = document.getElementById("products");
+        let cartCount = 0;
+
+        products.forEach(p => {
+            grid.innerHTML += `
+                <div class="product-card">
+                    <img class="product-img" src="${p.img}" alt="${p.name}">
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">${p.price}</div>
+                    <button onclick="addCart('${p.name}')">+ Carrinho</button>
+                </div>`;
+        });
+
+        function addCart(name) {
+            cartCount++;
+            document.getElementById("cart-count").textContent = cartCount;
+            showToast("✓ " + name + " adicionado!");
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.style.display = "block";
+            t.textContent = msg;
+            setTimeout(() => t.style.display = "none", 3000);
+        }
+    </script>
+</body>
+</html>
