@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhenoBrasil – Seed Bank</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+          --bg: #0d0d0d;
+          --bg2: #141414;
+          --bg3: #1c1c1c;
+          --border: #2a2a2a;
+          --gold: #c9a84c;
+          --gold2: #e8c96a;
+          --green: #3a7d44;
+          --green2: #4caf50;
+          --white: #f0ede8;
+          --muted: #888;
+          --red: #e05252;
+        }
+        body {
+          font-family: 'Barlow', sans-serif;
+          background: var(--bg);
+          color: var(--white);
+          min-height: 100vh;
+        }
+        .topbar {
+          background: var(--green);
+          padding: 0.4rem 2rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.78rem;
+          letter-spacing: 0.05em;
+        }
+        .topbar a { color: rgba(255,255,255,0.85); text-decoration: none; }
+        nav {
+          background: var(--bg);
+          border-bottom: 1px solid var(--border);
+          padding: 0 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 70px;
+          position: sticky;
+          top: 0;
+          z-index: 200;
+        }
+        .nav-logo {
+          color: var(--white);
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 1.2rem;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          cursor: pointer;
+        }
+        .hero {
+          background: linear-gradient(135deg, #0d0d0d 0%, #1a2a1a 50%, #0d0d0d 100%);
+          padding: 5rem 2rem;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+          border-bottom: 1px solid var(--border);
+        }
+        .hero-eyebrow {
+          display: inline-block;
+          background: rgba(201,168,76,0.1);
+          color: var(--gold);
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          padding: 0.3rem 1.2rem;
+          margin-bottom: 1.5rem;
+        }
+        .hero h1 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: clamp(3rem, 8vw, 5rem);
+          font-weight: 800;
+          text-transform: uppercase;
+          line-height: 0.95;
+          margin-bottom: 1.2rem;
+        }
+        .hero h1 span { color: var(--gold); }
+        .hero p {
+          color: var(--muted);
+          font-size: 1rem;
+          max-width: 520px;
+          margin: 0 auto 2rem;
+          line-height: 1.7;
+        }
+        .hero-actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        .btn-primary, .btn-outline {
+          padding: 0.85rem 2.2rem;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 1rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          border-radius: 2px;
+          cursor: pointer;
+          transition: all 0.2s;
+          border: none;
+        }
+        .btn-primary {
+          background: var(--green);
+          color: #fff;
+        }
+        .btn-primary:hover { background: var(--green2); transform: translateY(-1px); }
+        .btn-outline {
+          background: transparent;
+          color: var(--gold);
+          border: 1px solid var(--gold);
+        }
+        .btn-outline:hover { background: var(--gold); color: #000; }
+        .nav-right {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .nav-btn {
+          background: transparent;
+          border: 1px solid var(--border);
+          color: var(--white);
+          padding: 0.45rem 1rem;
+          font-size: 0.82rem;
+          font-family: 'Barlow', sans-serif;
+          cursor: pointer;
+          transition: all 0.2s;
+          border-radius: 2px;
+        }
+        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .nav-btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+        .nav-btn.primary:hover { background: var(--green2); border-color: var(--green2); }
+        .user-badge {
+          color: var(--gold);
+          font-size: 0.9rem;
+          font-weight: 700;
+          font-family: 'Barlow Condensed', sans-serif;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.85);
+          z-index: 500;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s;
+          backdrop-filter: blur(4px);
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal {
+          background: var(--bg2);
+          border: 1px solid var(--border);
+          border-top: 3px solid var(--gold);
+          width: 100%;
+          max-width: 440px;
+          padding: 2.5rem;
+          position: relative;
+          border-radius: 2px;
+        }
+        .modal-close {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: none;
+          border: none;
+          color: var(--muted);
+          font-size: 1.3rem;
+          cursor: pointer;
+          line-height: 1;
+        }
+        .modal-close:hover { color: var(--white); }
+        .modal h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 1.8rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          margin-bottom: 0.3rem;
+        }
+        .modal-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.8rem; }
+        .modal-tabs {
+          display: flex;
+          gap: 0;
+          margin-bottom: 1.8rem;
+          border-bottom: 1px solid var(--border);
+        }
+        .modal-tab {
+          flex: 1;
+          padding: 0.6rem;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          background: none;
+          border: none;
+          color: var(--muted);
+          cursor: pointer;
+          border-bottom: 2px solid transparent;
+          margin-bottom: -1px;
+          transition: all 0.2s;
+        }
+        .modal-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+        .form-group { margin-bottom: 1.1rem; }
+        .form-group label {
+          display: block;
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-bottom: 0.4rem;
+        }
+        .form-group input {
+          width: 100%;
+          background: var(--bg3);
+          border: 1px solid var(--border);
+          color: var(--white);
+          padding: 0.75rem 1rem;
+          font-family: 'Barlow', sans-serif;
+          font-size: 0.9rem;
+          outline: none;
+          border-radius: 2px;
+          transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: var(--gold); }
+        .form-group input::placeholder { color: var(--muted); }
+        .form-panel { display: none; }
+        .form-panel.active { display: block; }
+        .form-submit { width: 100%; background: var(--green); color: #fff; border: none; padding: 0.9rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border-radius: 2px; margin-top: 0.5rem; }
+        .form-submit:hover { background: var(--green2); }
+        .breeder-bar {
+          background: var(--bg2);
+          border-bottom: 1px solid var(--border);
+          padding: 1rem 2rem;
+          display: flex;
+          gap: 0.6rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+          gap: 0.6rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .pill {
+          background: transparent;
+          border: 1px solid var(--border);
+          color: var(--muted);
+          padding: 0.4rem 1.1rem;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 0.85rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+          border-radius: 2px;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+        .pill:hover, .pill.active { background: var(--green); border-color: var(--green); color: #fff; }
+        .main-wrap {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 3rem 2rem;
+        }
+        .section-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 2rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border);
+        }
+        .section-head h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 1.8rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .section-head h2 span { color: var(--gold); }
+        .product-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 1px;
+          background: var(--border);
+        }
+        .product-card {
+          background: var(--bg);
+          overflow: hidden;
+          transition: all 0.2s;
+          position: relative;
+        }
+        .product-card:hover { background: var(--bg2); }
+        .product-img-wrap { position: relative; overflow: hidden; }
+        .product-img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.4s; }
+        .product-card:hover .product-img { transform: scale(1.04); }
+        .breeder-tag {
+          position: absolute;
+          top: 0;
+          left: 0;
+          background: var(--green);
+          color: #fff;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          padding: 0.25rem 0.7rem;
+        }
+        .product-body { padding: 1rem 1.2rem 1.2rem; }
+        .product-name {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 1.05rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 0.8rem;
+          line-height: 1.3;
+          color: var(--white);
+          min-height: 2.6rem;
+        }
+        .product-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+        .product-price {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 1.3rem;
+          font-weight: 800;
+          color: var(--gold);
+        }
+        .add-btn {
+          background: var(--green);
+          color: #fff;
+          border: none;
+          padding: 0.5rem 1rem;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 0.85rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+          border-radius: 2px;
+          transition: all 0.2s;
+        }
+        .add-btn:hover { background: var(--green2); }
+        .newsletter {
+          background: var(--bg2);
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+        .newsletter h3 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 2rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          margin-bottom: 0.5rem;
+        }
+        .newsletter h3 span { color: var(--gold); }
+        .newsletter p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .nl-form {
+          display: flex;
+          max-width: 420px;
+          margin: 0 auto;
+          gap: 0;
+        }
+        .nl-input {
+          flex: 1;
+          background: var(--bg3);
+          border: 1px solid var(--border);
+          border-right: none;
+          color: var(--white);
+          padding: 0.8rem 1rem;
+          font-family: 'Barlow', sans-serif;
+          font-size: 0.9rem;
+          outline: none;
+        }
+        .nl-input:focus { border-color: var(--gold); }
+        .nl-submit {
+          background: var(--green);
+          color: #fff;
+          border: none;
+          padding: 0.8rem 1.5rem;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+        }
+        .toast {
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          background: var(--bg2);
+          color: var(--white);
+          padding: 0.9rem 1.5rem;
+          border-radius: 2px;
+          font-size: 0.88rem;
+          border-left: 3px solid var(--green);
+          transform: translateX(200%);
+          transition: transform 0.3s ease;
+          z-index: 999;
+          border: 1px solid var(--border);
+        }
+        .toast.show { transform: translateX(0); }
+        @media (max-width: 768px) {
+          .topbar { display: none; }
+          .nav { padding: 0 1rem; }
+          .hero { padding: 4rem 1.2rem; }
+          .main-wrap { padding: 2rem 1rem; }
+          .product-grid { grid-template-columns: repeat(2, 1fr); }
+          .nl-form { flex-direction: column; }
+          .nl-input { border-right: 1px solid var(--border); border-bottom: none; }
+          .nl-submit { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+      <span>🌱 Sementes premium de coleção — Breeders brasileiros</span>
+      <a href="#newsletter">Receba novidades</a>
+    </div>
+    <nav>
+      <div class="nav-logo">PhenoBrasil</div>
+      <div class="nav-right">
+        <span class="user-badge" id="user-badge"></span>
+        <button class="nav-btn" id="login-btn" type="button" onclick="openModal('login')">Entrar</button>
+        <button class="nav-btn primary" id="register-btn" type="button" onclick="openModal('register')">Cadastrar</button>
+        <button class="nav-btn" id="logout-btn" type="button" onclick="handleLogout()" style="display:none;">Sair</button>
+      </div>
+    </nav>
+    <section class="hero">
+      <div class="hero-eyebrow">🌿 Seed Bank Premium</div>
+      <h1>As melhores<br><span>genéticas</span><br>do Brasil</h1>
+      <p>Variedades raras, exóticas e exclusivas criadas e selecionadas pelos melhores breeders do Brasil. Sementes para o colecionador apaixonado.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" type="button" onclick="document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' })">Ver catálogo</button>
+        <button class="btn-outline" type="button" onclick="document.getElementById('newsletter').scrollIntoView({ behavior: 'smooth' })">Newsletter</button>
+      </div>
+    </section>
+    <div class="breeder-bar">
+      <button class="pill active" onclick="filterBreeder('all', this)">Todos</button>
+      <button class="pill" onclick="filterBreeder('rasbreeder', this)">Rasbreeder</button>
+      <button class="pill" onclick="filterBreeder('basinaldo', this)">Basinaldo</button>
+    </div>
+    <div class="main-wrap" id="catalogo">
+      <div class="section-head">
+        <h2>Catálogo <span>Premium</span></h2>
+      </div>
+      <div class="product-grid" id="products"></div>
+    </div>
+    <section class="newsletter" id="newsletter">
+      <h3>Novidades <span>Exclusivas</span></h3>
+      <p>Seja o primeiro a saber sobre novas drops e promoções especiais.</p>
+      <form class="nl-form" id="newsletter-form">
+        <input id="newsletter-email" class="nl-input" type="email" placeholder="Seu melhor e-mail" required />
+        <button class="nl-submit" type="submit">Quero receber</button>
+      </form>
+    </section>
+    <footer>
+      <div style="padding: 2rem; text-align: center; color: var(--muted); font-size: 0.9rem;">
+        © 2026 PhenoBrasil. Projeto integrado com Firebase.
+      </div>
+    </footer>
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+      <div class="modal">
+        <button class="modal-close" type="button" onclick="closeModal()">×</button>
+        <h2 id="modal-title">Entrar</h2>
+        <p class="modal-sub">Entre ou cadastre-se para acessar ofertas exclusivas.</p>
+        <div class="modal-tabs">
+          <button class="modal-tab active" id="tab-login" type="button" onclick="switchTab('login')">Entrar</button>
+          <button class="modal-tab" id="tab-register" type="button" onclick="switchTab('register')">Cadastrar</button>
+        </div>
+        <div class="form-panel active" id="panel-login">
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-email">E-mail</label>
+              <input id="login-email" type="email" placeholder="seu@exemplo.com" required />
+            </div>
+            <div class="form-group">
+              <label for="login-password">Senha</label>
+              <input id="login-password" type="password" placeholder="••••••••" required />
+            </div>
+            <button class="form-submit" type="submit">Entrar</button>
+          </form>
+        </div>
+        <div class="form-panel" id="panel-register">
+          <form id="register-form">
+            <div class="form-group">
+              <label for="register-email">E-mail</label>
+              <input id="register-email" type="email" placeholder="seu@exemplo.com" required />
+            </div>
+            <div class="form-group">
+              <label for="register-password">Senha</label>
+              <input id="register-password" type="password" placeholder="Mínimo 6 caracteres" required />
+            </div>
+            <button class="form-submit" type="submit">Cadastrar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+      import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAJTlL-4piG67VOM_y480dhyib2qaF3Bso',
+        authDomain: 'phenobrasil.firebaseapp.com',
+        projectId: 'phenobrasil',
+        storageBucket: 'phenobrasil.firebasestorage.app',
+        messagingSenderId: '825755980394',
+        appId: '1:825755980394:web:caad888821d128fb133013'
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const productsEl = document.getElementById('products');
+      const toast = document.getElementById('toast');
+      const newsletterForm = document.getElementById('newsletter-form');
+      const newsletterEmail = document.getElementById('newsletter-email');
+      const userBadge = document.getElementById('user-badge');
+      const loginBtn = document.getElementById('login-btn');
+      const registerBtn = document.getElementById('register-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const modalOverlay = document.getElementById('modal-overlay');
+      const modalTitle = document.getElementById('modal-title');
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegister = document.getElementById('tab-register');
+      const panelLogin = document.getElementById('panel-login');
+      const panelRegister = document.getElementById('panel-register');
+
+      const fallbackProducts = [
+        {
+          name: 'Genética Teste',
+          price: 'R$ 100,00',
+          breeder: 'rasbreeder',
+          img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+          description: 'Semente rara, ideal para colecionadores.'
+        },
+        {
+          name: 'Basinaldo Original',
+          price: 'R$ 180,00',
+          breeder: 'basinaldo',
+          img: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80',
+          description: 'Genética exclusiva do breeder Basinaldo.'
+        }
+      ];
+
+      let allProducts = [...fallbackProducts];
+      let currentFilter = 'all';
+
+      async function loadProducts() {
+        try {
+          const productsSnapshot = await getDocs(query(collection(db, 'products'), orderBy('name')));
+          const firestoreProducts = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          if (firestoreProducts.length) {
+            allProducts = firestoreProducts;
+          }
+        } catch (error) {
+          console.warn('Não foi possível carregar produtos do Firestore, usando fallback.', error);
+        }
+        renderProducts();
+      }
+
+      function renderProducts() {
+        productsEl.innerHTML = '';
+        const items = allProducts.filter(product => currentFilter === 'all' || product.breeder === currentFilter);
+        if (!items.length) {
+          productsEl.innerHTML = '<div style="padding:2rem;color:var(--muted);">Nenhum produto encontrado para esse filtro.</div>';
+          return;
+        }
+        items.forEach(product => {
+          const card = document.createElement('article');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <div class="product-img-wrap">
+              <img class="product-img" src="${product.img || 'https://images.unsplash.com/photo-1518972559570-9c7a655183c5?auto=format&fit=crop&w=800&q=80'}" alt="${product.name}" />
+              <div class="breeder-tag">${product.breeder}</div>
+            </div>
+            <div class="product-body">
+              <div class="product-name">${product.name}</div>
+              <p style="color:var(--muted);font-size:0.9rem;margin-bottom:1rem;line-height:1.5;">${product.description || 'Semente premium selecionada com cuidado.'}</p>
+              <div class="product-footer">
+                <div class="product-price">${product.price}</div>
+                <button class="add-btn" type="button" onclick="showToast('Adicionado ao carrinho!')">Adicionar</button>
+              </div>
+            </div>
+          `;
+          productsEl.appendChild(card);
+        });
+      }
+
+      window.filterBreeder = function(breeder, btn) {
+        currentFilter = breeder;
+        document.querySelectorAll('.pill').forEach(item => item.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderProducts();
+      };
+
+      newsletterForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        const email = newsletterEmail.value.trim();
+        if (!email) {
+          showToast('Digite um e-mail válido.');
+          return;
+        }
+        try {
+          await addDoc(collection(db, 'newsletter'), {
+            email,
+            createdAt: serverTimestamp()
+          });
+          newsletterForm.reset();
+          showToast('Obrigado! E-mail cadastrado com sucesso.');
+        } catch (error) {
+          console.error('Erro ao salvar newsletter:', error);
+          showToast('Falha ao cadastrar. Tente novamente.');
+        }
+      });
+
+      loginForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          showToast('Login realizado com sucesso.');
+          closeModal();
+          document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+          console.error('Erro no login:', error);
+          showToast('Falha no login. Verifique seus dados.');
+        }
+      });
+
+      registerForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          showToast('Cadastro concluído com sucesso.');
+          closeModal();
+          document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+          console.error('Erro no cadastro:', error);
+          showToast('Falha no cadastro. Use um e-mail e senha válidos.');
+        }
+      });
+
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          userBadge.textContent = user.email;
+          userBadge.style.display = 'inline-flex';
+          loginBtn.style.display = 'none';
+          registerBtn.style.display = 'none';
+          logoutBtn.style.display = 'inline-flex';
+        } else {
+          userBadge.textContent = '';
+          userBadge.style.display = 'none';
+          loginBtn.style.display = 'inline-flex';
+          registerBtn.style.display = 'inline-flex';
+          logoutBtn.style.display = 'none';
+        }
+      });
+
+      function handleLogout() {
+        signOut(auth).then(() => {
+          showToast('Você saiu da conta.');
+        }).catch(error => {
+          console.error('Erro ao sair:', error);
+          showToast('Falha ao sair. Tente novamente.');
+        });
+      }
+
+      function openModal(tab) {
+        modalOverlay.classList.add('open');
+        switchTab(tab);
+      }
+
+      function closeModal() {
+        modalOverlay.classList.remove('open');
+      }
+
+      function closeModalOutside(event) {
+        if (event.target === modalOverlay) closeModal();
+      }
+
+      function switchTab(tab) {
+        modalTitle.textContent = tab === 'register' ? 'Cadastrar' : 'Entrar';
+        tabLogin.classList.toggle('active', tab === 'login');
+        tabRegister.classList.toggle('active', tab === 'register');
+        panelLogin.classList.toggle('active', tab === 'login');
+        panelRegister.classList.toggle('active', tab === 'register');
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3200);
+      }
+
+      loadProducts();
+    </script>
+</body>
+</html>
